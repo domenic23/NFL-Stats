@@ -108,7 +108,29 @@ receiving_2018 = nfl_stats_scrape(all_receiving2018)
 receiving_2018 = receiving_2018.drop(columns='Rec YAC/R')
 receiving_2018['Year']=2018
 
+#top 50 kickers stats 2020
+kicking2020_25 = 'https://www.nfl.com/stats/player-stats/category/field-goals/2020/REG/all/kickingfgmade/desc'
+kicking2020_50 = 'https://www.nfl.com/stats/player-stats/category/field-goals/2020/REG/all/kickingFgMade/DESC?aftercursor=0000001900000000008500100079000840320000000000006e00000005000000045f74626c00000010706572736f6e5f7465616d5f7374617400000005657362496400000009534c4f33313533313300000004726f6c6500000003504c5900000008736561736f6e496400000004323032300000000a736561736f6e5479706500000003524547f07fffffe6f07fffffe6e6f14c9148e98621e15f5b002cb0f69e0004'
+all_kicking2020 = [kicking2020_25, kicking2020_50]
+kicking_2020 = nfl_stats_scrape(all_kicking2020)
+kicking_2020 = kicking_2020.drop(columns='FG Blk')
+kicking_2020['Year']=2020
 
+#top 50 kickers stats 2019
+kicking2019_25 = 'https://www.nfl.com/stats/player-stats/category/field-goals/2019/REG/all/kickingfgmade/desc'
+kicking2019_50 = 'https://www.nfl.com/stats/player-stats/category/field-goals/2019/REG/all/kickingFgMade/DESC?aftercursor=0000001900000000008500100079000840340000000000006e00000005000000045f74626c00000010706572736f6e5f7465616d5f73746174000000056573624964000000094d414832393433383500000004726f6c6500000003504c5900000008736561736f6e496400000004323031390000000a736561736f6e5479706500000003524547f07fffffe6f07fffffe63b3fb1a3e0cfe73ecf82d63b5c80b7bd0004'
+all_kicking2019 = [kicking2019_25, kicking2019_50]
+kicking_2019 = nfl_stats_scrape(all_kicking2019)
+kicking_2019 = kicking_2019.drop(columns='FG Blk')
+kicking_2019['Year']=2019
+
+#top 50 kickers stats 2018
+kicking2018_25 = 'https://www.nfl.com/stats/player-stats/category/field-goals/2018/REG/all/kickingfgmade/desc'
+kicking2018_50 = 'https://www.nfl.com/stats/player-stats/category/field-goals/2018/REG/all/kickingFgMade/DESC?aftercursor=0000001900000000008500100079000840320000000000006e00000005000000045f74626c00000010706572736f6e5f7465616d5f737461740000000565736249640000000953414e33343239323700000004726f6c6500000003504c5900000008736561736f6e496400000004323031380000000a736561736f6e5479706500000003524547f07fffffe6f07fffffe64663faf88c30db579c5c2257a3a494ec0004'
+all_kicking2018 = [kicking2018_25, kicking2018_50]
+kicking_2018 = nfl_stats_scrape(all_kicking2018)
+kicking_2018 = kicking_2018.drop(columns='FG Blk')
+kicking_2018['Year']=2018
 
 ###### ALL PASSING ######
 passing = pd.concat([passing_2020, passing_2019, passing_2018]).set_index(['Year', 'Player'])
@@ -119,13 +141,18 @@ rushing = pd.concat([rushing_2020, rushing_2019, rushing_2018]).set_index(['Year
 ###### ALL RECEIVING ######
 receiving = pd.concat([receiving_2020, receiving_2019, receiving_2018]).set_index(['Year', 'Player'])
 
+###### ALL KICKING ######
+kicking = pd.concat([kicking_2020, kicking_2019, kicking_2018]).set_index(['Year', 'Player'])
 
 
-#example comparing Tom Brady's last three seasons
-passing.loc[[(2020,'Tom Brady'),(2019, 'Tom Brady'), (2018, 'Tom Brady')]]
+# #example comparing Tom Brady's last three seasons
+# passing.loc[[(2020,'Tom Brady'),(2019, 'Tom Brady'), (2018, 'Tom Brady')]]
 
-#example comparing Derrick Henry's last three seasons
-rushing.loc[[(2020, 'Derrick Henry'), (2019, 'Derrick Henry'), (2018, 'Derrick Henry')]]
+# #example comparing Derrick Henry's last three seasons
+# rushing.loc[[(2020, 'Derrick Henry'), (2019, 'Derrick Henry'), (2018, 'Derrick Henry')]]
 
-#example comparing DeAndre Hopkins' last three seasons
-receiving.loc[[(2020, 'DeAndre Hopkins'), (2019, 'DeAndre Hopkins'), (2018, 'DeAndre Hopkins')]]
+# #example comparing DeAndre Hopkins' last three seasons
+# receiving.loc[[(2020, 'DeAndre Hopkins'), (2019, 'DeAndre Hopkins'), (2018, 'DeAndre Hopkins')]]
+
+# #example comparing Justin Tucker's last three seasons
+# kicking.loc[[(2020, 'Justin Tucker'), (2019, 'Justin Tucker'), (2018, 'Justin Tucker')]]
