@@ -57,3 +57,8 @@ QB_2017 = fantasy_pros_scrape(FprosQB_2017)
 #2016 QB Stats in order of top fantasy performer (STD)
 FprosQB_2016 = 'https://www.fantasypros.com/nfl/stats/qb.php?year=2016'
 QB_2016 = fantasy_pros_scrape(FprosQB_2016)
+
+QB_2020['Cmp'] = QB_2020['Cmp'].astype('int')
+QB_2020['Yds'] = QB_2020['Yds'].str.replace(',', '').astype('int')
+plot1 = QB_2020.head(10).plot(x='Player', y='Cmp', kind='bar')
+plot2 = QB_2020.head(10).plot(x='Player', y='Yds', kind='bar')
