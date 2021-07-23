@@ -126,7 +126,7 @@ K_STD_2017 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/k.php?ye
 K_STD_2016 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/k.php?year=2016&scoring=Standard')
 
 #example graphs
-QB_2020['Cmp'] = QB_2020['Cmp'].astype('int')
-QB_2020['Yds'] = QB_2020['Yds'].str.replace(',', '').astype('int')
-plot1 = QB_2020.head(10).plot(x='Player', y='Cmp', kind='bar')
-plot2 = QB_2020.head(10).plot(x='Player', y='Yds', kind='bar')
+QB_STD_2020['Comp'] = QB_STD_2020['Comp'].astype('int')
+QB_STD_2020['Yds'] = QB_STD_2020['Yds'].str.replace(',', '').astype('int')
+plot1 = QB_STD_2020.head(10).plot(x='Player', y='Comp', kind='bar')
+plot2 = QB_STD_2020.head(10).plot(x='Player', y='Yds', kind='bar')
