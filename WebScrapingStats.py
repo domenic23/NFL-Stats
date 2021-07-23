@@ -130,3 +130,10 @@ QB_2020['Cmp'] = QB_2020['Cmp'].astype('int')
 QB_2020['Yds'] = QB_2020['Yds'].str.replace(',', '').astype('int')
 plot1 = QB_2020.head(10).plot(x='Player', y='Cmp', kind='bar')
 plot2 = QB_2020.head(10).plot(x='Player', y='Yds', kind='bar')
+
+#top 29 kickers, they have at least 12 games played
+
+# i wanted the colour of the dots to change in relation to the total fantasy points each player had. did not work in the slightest and now my x labels are gone
+K_STD_2020['FG'] = K_STD_2020['FG'].astype('int')
+K_STD_2020['XPT'] = K_STD_2020['XPT'].astype('int')
+K_STD_2020.head(29).plot(x='FG', y='XPT', c='b', s=K_STD_2020['FPTS'].head(29).astype('float'),colormap='viridis', kind='scatter', title='Correlation Between FGs and Extra Points(XPT) Made').axis([0,40,0,60]) 
