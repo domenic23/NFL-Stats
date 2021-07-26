@@ -173,10 +173,10 @@ TE_PPR = pd.concat(all_TE_PPR).set_index(['Year','Player'])
 K = pd.concat(all_K).set_index(['Year','Player'])
 
 #example graphs
-QB_2020['Cmp'] = QB_2020['Cmp'].astype('int')
-QB_2020['Yds'] = QB_2020['Yds'].str.replace(',', '').astype('int')
-plot1 = QB_2020.head(10).plot(x='Player', y='Cmp', kind='bar')
-plot2 = QB_2020.head(10).plot(x='Player', y='Yds', kind='bar')
+QB_STD_2020['Comp'] = QB_STD_2020['Comp'].astype('int')
+QB_STD_2020['Yds'] = QB_STD_2020['Yds'].str.replace(',', '').astype('int')
+plot1 = QB_STD_2020.head(10).plot(x='Player', y='Comp', kind='bar')
+plot2 = QB_STD_2020.head(10).plot(x='Player', y='Yds', kind='bar')
 
 #top 29 kickers, they have at least 12 games played
 # i wanted the colour of the dots to change in relation to the total fantasy points each player had. did not work in the slightest and now my x labels are gone
