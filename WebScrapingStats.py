@@ -14,6 +14,12 @@ all_TE_STD = []
 all_TE_PPR = []
 all_K = []
 
+def to_numeric(df):
+    for column in df.columns:
+        if column != 'Player':
+            df[column]=df[column].str.replace(',', '').astype('float')
+    return df
+
 def renaming_columns(df, URL):
     global all_QB
     global all_RB_STD
@@ -33,12 +39,14 @@ def renaming_columns(df, URL):
     if re.search('qb', URL):
         df.columns = ['Rank', 'Player', 'Comp', 'Att', 'Comp%', 'Yds', 'Y/A', 'PassTD', 'INT', 'SCK', 'RushAtt', 'RushYds', 'RushTD', 'FL', 'GP', 'FPTS', 'FPTS/G', 'OWN', 'Year']
         df=df.set_index('Rank').drop(labels='OWN', axis=1)
+        df=to_numeric(df)
         all_QB.append(df)
 
     #renaming the columns for RBs
     elif re.search('rb', URL):
         df.columns = ['Rank', 'Player', 'RushAtt', 'RushYds', 'Y/A', 'LG', '20+', 'RushTD', 'Rec', 'TGT', 'RecYds', 'Y/R', 'RecTD', 'FL', 'GP', 'FPTS', 'FPTS/G', 'OWN', 'Year']
         df=df.set_index('Rank').drop(labels=['OWN', '20+'], axis=1)
+        df=to_numeric(df)
         if re.search('Standard', URL):
             all_RB_STD.append(df)
         elif re.search('PPR', URL):
@@ -48,6 +56,7 @@ def renaming_columns(df, URL):
     elif re.search('wr', URL):
         df.columns = ['Rank', 'Player', 'Rec', 'TGT', 'RecYds', 'Y/R', 'LG', '20+', 'RecTD', 'RushAtt', 'RushYds', 'RushTD', 'FL', 'GP', 'FPTS', 'FPTS/G', 'OWN', 'Year']
         df=df.set_index('Rank').drop(labels=['OWN', '20+'], axis=1)
+        df=to_numeric(df)
         if re.search('Standard', URL):
             all_WR_STD.append(df)
         elif re.search('PPR', URL):
@@ -57,6 +66,7 @@ def renaming_columns(df, URL):
     elif re.search('te', URL):
         df.columns = ['Rank', 'Player', 'Rec', 'TGT', 'RecYds', 'Y/R', 'LG', '20+', 'RecTD', 'RushAtt', 'RushYds', 'RushTD', 'FL', 'GP', 'FPTS', 'FPTS/G', 'OWN', 'Year']
         df=df.set_index('Rank').drop(labels=['OWN', '20+', 'RushAtt', 'RushYds', 'RushTD'], axis=1)
+        df=to_numeric(df)
         if re.search('Standard', URL):
             all_TE_STD.append(df)
         elif re.search('PPR', URL):
@@ -66,8 +76,9 @@ def renaming_columns(df, URL):
     elif re.search('k', URL):
         df.columns = ['Rank', 'Player', 'FG', 'FGA', 'PCT(%)', 'LG', '1-19', '20-29', '30-39', '40-49', '50+', 'XPT', 'XPA', 'GP', 'FPTS', 'FPTS/G', 'OWN', 'Year']
         df=df.set_index('Rank').drop(labels=['OWN'], axis=1)
+        df=to_numeric(df)
         all_K.append(df)
-            
+    
     return df
 
 def fantasy_pros_scrape(URL):
@@ -91,6 +102,7 @@ def fantasy_pros_scrape(URL):
         l.append(row)
 
     df = pd.DataFrame(l, columns=column_names)
+
     df = renaming_columns(df, URL)                                                            #renames the columns, adds the year, appends the DataFrames to a collective list for each position
 
     return df
@@ -173,13 +185,4 @@ TE_PPR = pd.concat(all_TE_PPR).set_index(['Year','Player'])
 K = pd.concat(all_K).set_index(['Year','Player'])
 
 #example graphs
-QB_STD_2020['Comp'] = QB_STD_2020['Comp'].astype('int')
-QB_STD_2020['Yds'] = QB_STD_2020['Yds'].str.replace(',', '').astype('int')
-plot1 = QB_STD_2020.head(10).plot(x='Player', y='Comp', kind='bar')
-plot2 = QB_STD_2020.head(10).plot(x='Player', y='Yds', kind='bar')
-
-#top 29 kickers, they have at least 12 games played
-# i wanted the colour of the dots to change in relation to the total fantasy points each player had. did not work in the slightest and now my x labels are gone
-K_STD_2020['FG'] = K_STD_2020['FG'].astype('int')
-K_STD_2020['XPT'] = K_STD_2020['XPT'].astype('int')
-K_STD_2020.head(29).plot(x='FG', y='XPT', c='b', s=K_STD_2020['FPTS'].head(29).astype('float'),colormap='viridis', kind='scatter', title='Correlation Between FGs and Extra Points(XPT) Made').axis([0,40,0,60]) 
+K.hvplot(x='FG', y='XPT', width=1200, height=800, kind='scatter', c='FPTS', colormap='viridis') #FG to XPTs
