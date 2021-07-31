@@ -4,6 +4,7 @@ import re
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+import hvplot.pandas
 
 all_QB = []
 all_RB_STD = []
@@ -105,74 +106,17 @@ def fantasy_pros_scrape(URL):
 
     df = renaming_columns(df, URL)                                                            #renames the columns, adds the year, appends the DataFrames to a collective list for each position
 
-    return df
-
-# All positions in order of top fantasy performers in each respective scoring rules (Standard or Points Per Reception(PPR))
-### Quarterbacks ###
-
-# Standard Scoring
-QB_STD_2020 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/qb.php?year=2020&scoring=Standard')
-QB_STD_2019 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/qb.php?year=2019&scoring=Standard')
-QB_STD_2018 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/qb.php?year=2018&scoring=Standard')
-QB_STD_2017 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/qb.php?year=2017&scoring=Standard')
-QB_STD_2016 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/qb.php?year=2016&scoring=Standard')
-
-### Running Backs ### 
-
-# Standard Scoring
-RB_STD_2020 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/rb.php?year=2020&scoring=Standard')
-RB_STD_2019 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/rb.php?year=2019&scoring=Standard')
-RB_STD_2018 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/rb.php?year=2018&scoring=Standard')
-RB_STD_2017 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/rb.php?year=2017&scoring=Standard')
-RB_STD_2016 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/rb.php?year=2016&scoring=Standard')
-
-#PPR Scoring
-RB_PPR_2020 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/rb.php?year=2020&scoring=PPR')
-RB_PPR_2019 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/rb.php?year=2019&scoring=PPR')
-RB_PPR_2018 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/rb.php?year=2018&scoring=PPR')
-RB_PPR_2017 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/rb.php?year=2017&scoring=PPR')
-RB_PPR_2016 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/rb.php?year=2016&scoring=PPR')
-
-### Wide Receivers ###
-
-# Standard Scoring
-WR_STD_2020 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/wr.php?year=2020&scoring=Standard')
-WR_STD_2019 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/wr.php?year=2019&scoring=Standard')
-WR_STD_2018 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/wr.php?year=2018&scoring=Standard')
-WR_STD_2017 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/wr.php?year=2017&scoring=Standard')
-WR_STD_2016 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/wr.php?year=2016&scoring=Standard')
-
-#PPR Scoring
-WR_PPR_2020 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/wr.php?year=2020&scoring=PPR')
-WR_PPR_2019 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/wr.php?year=2019&scoring=PPR')
-WR_PPR_2018 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/wr.php?year=2018&scoring=PPR')
-WR_PPR_2017 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/wr.php?year=2017&scoring=PPR')
-WR_PPR_2016 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/wr.php?year=2016&scoring=PPR')
-
-### Tight Ends ###
-
-#Standard Scoring
-TE_STD_2020 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/te.php?year=2020&scoring=Standard')
-TE_STD_2019 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/te.php?year=2019&scoring=Standard')
-TE_STD_2018 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/te.php?year=2018&scoring=Standard')
-TE_STD_2017 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/te.php?year=2017&scoring=Standard')
-TE_STD_2016 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/te.php?year=2016&scoring=Standard')
-
-#PPR Scoring
-TE_PPR_2020 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/te.php?year=2020&scoring=PPR')
-TE_PPR_2019 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/te.php?year=2019&scoring=PPR')
-TE_PPR_2018 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/te.php?year=2018&scoring=PPR')
-TE_PPR_2017 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/te.php?year=2017&scoring=PPR')
-TE_PPR_2016 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/te.php?year=2016&scoring=PPR')
-
-### Kickers ###
-
-#Standard Scoring
-K_STD_2020 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/k.php?year=2020&scoring=Standard')
-K_STD_2019 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/k.php?year=2019&scoring=Standard')
-K_STD_2018 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/k.php?year=2018&scoring=Standard')
-K_STD_2017 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/k.php?year=2017&scoring=Standard')
-K_STD_2016 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/k.php?year=2016&scoring=Standard')
+end_year = 2020
+start_year = 2015
+for year in range(end_year, start_year, -1):
+    fantasy_pros_scrape(f'https://www.fantasypros.com/nfl/stats/qb.php?year={year}&scoring=Standard')
+    fantasy_pros_scrape(f'https://www.fantasypros.com/nfl/stats/rb.php?year={year}&scoring=Standard')
+    fantasy_pros_scrape(f'https://www.fantasypros.com/nfl/stats/rb.php?year={year}&scoring=PPR')
+    fantasy_pros_scrape(f'https://www.fantasypros.com/nfl/stats/wr.php?year={year}&scoring=Standard')
+    fantasy_pros_scrape(f'https://www.fantasypros.com/nfl/stats/wr.php?year={year}&scoring=PPR')
+    fantasy_pros_scrape(f'https://www.fantasypros.com/nfl/stats/te.php?year={year}&scoring=Standard')
+    fantasy_pros_scrape(f'https://www.fantasypros.com/nfl/stats/te.php?year={year}&scoring=PPR')
+    fantasy_pros_scrape(f'https://www.fantasypros.com/nfl/stats/k.php?year={year}&scoring=Standard')
 
 ##### ALL Postions #####
 QB = pd.concat(all_QB).set_index(['Year','Player'])
