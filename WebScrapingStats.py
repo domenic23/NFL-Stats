@@ -4,12 +4,7 @@ import re
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-<<<<<<< HEAD
 import hvplot.pandas
-=======
-# import threading
-# import time
->>>>>>> 55ec496e38e9b2ba7c6aa538924ab13ea424c488
 
 all_QB = []
 all_RB_STD = []
