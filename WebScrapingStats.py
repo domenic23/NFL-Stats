@@ -15,9 +15,13 @@ all_TE_STD = []
 all_TE_PPR = []
 all_K = []
 
-positions = [all_QB, all_RB_PPR, all_RB_STD, all_WR_PPR, all_WR_STD, all_TE_PPR, all_TE_STD, all_K]
+def to_numeric(df):
+    for column in df.columns:
+        if column != 'Player':
+            df[column]=df[column].str.replace(',', '').astype('float')
+    return df
 
-def append_to_list(df, URL):
+def renaming_columns(df, URL):
     global all_QB
     global all_RB_STD
     global all_RB_PPR
@@ -26,74 +30,60 @@ def append_to_list(df, URL):
     global all_TE_STD
     global all_TE_PPR
     global all_K
+
+    #adding the year to each Dataframe for uses later
+    for i in range(2020,2015,-1):
+            if re.search(str(i), URL):
+                df['Year'] = str(i)
     
+    #renaming the columns for QBs
     if re.search('qb', URL):
+        df.columns = ['Rank', 'Player', 'Comp', 'Att', 'Comp%', 'Yds', 'Y/A', 'PassTD', 'INT', 'SCK', 'RushAtt', 'RushYds', 'RushTD', 'FL', 'GP', 'FPTS', 'FPTS/G', 'OWN', 'Year']
+        df=df.set_index('Rank').drop(labels='OWN', axis=1)
+        df=to_numeric(df)
         all_QB.append(df)
 
+    #renaming the columns for RBs
     elif re.search('rb', URL):
+        df.columns = ['Rank', 'Player', 'RushAtt', 'RushYds', 'Y/A', 'LG', '20+', 'RushTD', 'Rec', 'TGT', 'RecYds', 'Y/R', 'RecTD', 'FL', 'GP', 'FPTS', 'FPTS/G', 'OWN', 'Year']
+        df=df.set_index('Rank').drop(labels=['OWN', '20+'], axis=1)
+        df=to_numeric(df)
         if re.search('Standard', URL):
             all_RB_STD.append(df)
         elif re.search('PPR', URL):
             all_RB_PPR.append(df)
 
+    #renaming the columns for WRs
     elif re.search('wr', URL):
+        df.columns = ['Rank', 'Player', 'Rec', 'TGT', 'RecYds', 'Y/R', 'LG', '20+', 'RecTD', 'RushAtt', 'RushYds', 'RushTD', 'FL', 'GP', 'FPTS', 'FPTS/G', 'OWN', 'Year']
+        df=df.set_index('Rank').drop(labels=['OWN', '20+'], axis=1)
+        df=to_numeric(df)
         if re.search('Standard', URL):
             all_WR_STD.append(df)
         elif re.search('PPR', URL):
             all_WR_PPR.append(df)
-
+            
+    #renaming the columns for TEs
     elif re.search('te', URL):
+        df.columns = ['Rank', 'Player', 'Rec', 'TGT', 'RecYds', 'Y/R', 'LG', '20+', 'RecTD', 'RushAtt', 'RushYds', 'RushTD', 'FL', 'GP', 'FPTS', 'FPTS/G', 'OWN', 'Year']
+        df=df.set_index('Rank').drop(labels=['OWN', '20+', 'RushAtt', 'RushYds', 'RushTD'], axis=1)
+        df=to_numeric(df)
         if re.search('Standard', URL):
             all_TE_STD.append(df)
         elif re.search('PPR', URL):
             all_TE_PPR.append(df)
-
+        
+    #renaming the columns for Ks
     elif re.search('k', URL):
+        df.columns = ['Rank', 'Player', 'FG', 'FGA', 'PCT(%)', 'LG', '1-19', '20-29', '30-39', '40-49', '50+', 'XPT', 'XPA', 'GP', 'FPTS', 'FPTS/G', 'OWN', 'Year']
+        df=df.set_index('Rank').drop(labels=['OWN'], axis=1)
+        df=to_numeric(df)
         all_K.append(df)
-
-def to_numeric(df):
-    for column in df.columns:
-        if column != 'Player':
-            df[column]=df[column].str.replace(',', '').astype('float')
+    
     return df
 
-def renaming_columns(positions):
-
-    for df in positions:
-        #making the variable name a string to find the position for regex
-        pos = [k for k,v in locals().items() if v is df][0]
-        
-        #renaming the columns for QBs
-        if re.search('QB', pos):
-            df.columns = ['Rank', 'Player', 'Comp', 'Att', 'Comp%', 'Yds', 'Y/A', 'PassTD', 'INT', 'SCK', 'RushAtt', 'RushYds', 'RushTD', 'FL', 'GP', 'FPTS', 'FPTS/G', 'OWN', 'Year']
-            df=df.set_index('Rank').drop(labels='OWN', axis=1)
-            df=to_numeric(df)
-        
-        #renaming the columns for RBs
-        elif re.search('RB', pos):
-            df.columns = ['Rank', 'Player', 'RushAtt', 'RushYds', 'Y/A', 'LG', '20+', 'RushTD', 'Rec', 'TGT', 'RecYds', 'Y/R', 'RecTD', 'FL', 'GP', 'FPTS', 'FPTS/G', 'OWN', 'Year']
-            df=df.set_index('Rank').drop(labels=['OWN', '20+'], axis=1)
-            df=to_numeric(df)
-
-        #renaming the columns for WRs
-        elif re.search('WR', pos):
-            df.columns = ['Rank', 'Player', 'Rec', 'TGT', 'RecYds', 'Y/R', 'LG', '20+', 'RecTD', 'RushAtt', 'RushYds', 'RushTD', 'FL', 'GP', 'FPTS', 'FPTS/G', 'OWN', 'Year']
-            df=df.set_index('Rank').drop(labels=['OWN', '20+'], axis=1)
-            df=to_numeric(df)
-      
-        #renaming the columns for TEs
-        elif re.search('TE', pos):
-            df.columns = ['Rank', 'Player', 'Rec', 'TGT', 'RecYds', 'Y/R', 'LG', '20+', 'RecTD', 'RushAtt', 'RushYds', 'RushTD', 'FL', 'GP', 'FPTS', 'FPTS/G', 'OWN', 'Year']
-            df=df.set_index('Rank').drop(labels=['OWN', '20+', 'RushAtt', 'RushYds', 'RushTD'], axis=1)
-            df=to_numeric(df)
-
-        #renaming the columns for Ks
-        elif re.search('K', pos):
-            df.columns = ['Rank', 'Player', 'FG', 'FGA', 'PCT(%)', 'LG', '1-19', '20-29', '30-39', '40-49', '50+', 'XPT', 'XPA', 'GP', 'FPTS', 'FPTS/G', 'OWN', 'Year']
-            df=df.set_index('Rank').drop(labels=['OWN'], axis=1)
-            df=to_numeric(df)
-
 def fantasy_pros_scrape(URL):
+ 
     #scraping the URL
     r = requests.get(URL)
     stats = bs(r.content, features='lxml')
@@ -113,15 +103,8 @@ def fantasy_pros_scrape(URL):
         l.append(row)
 
     df = pd.DataFrame(l, columns=column_names)
-    
-    # adding the year to each Dataframe for uses later
-    for i in range(2020,2015,-1):
-            if re.search(str(i), URL):
-                df['Year'] = str(i)
 
-    append_to_list(df, URL)
-
-renaming_columns(positions)                                                            #renames the columns, adds the year, appends the DataFrames to a collective list for each position
+    df = renaming_columns(df, URL)                                                            #renames the columns, adds the year, appends the DataFrames to a collective list for each position
 
 end_year = 2020
 start_year = 2015
