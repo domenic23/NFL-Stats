@@ -4,6 +4,8 @@ import re
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+# import threading
+# import time
 
 all_QB = []
 all_RB_STD = []
@@ -14,13 +16,9 @@ all_TE_STD = []
 all_TE_PPR = []
 all_K = []
 
-def to_numeric(df):
-    for column in df.columns:
-        if column != 'Player':
-            df[column]=df[column].str.replace(',', '').astype('float')
-    return df
+positions = [all_QB, all_RB_PPR, all_RB_STD, all_WR_PPR, all_WR_STD, all_TE_PPR, all_TE_STD, all_K]
 
-def renaming_columns(df, URL):
+def append_to_list(df, URL):
     global all_QB
     global all_RB_STD
     global all_RB_PPR
@@ -29,60 +27,74 @@ def renaming_columns(df, URL):
     global all_TE_STD
     global all_TE_PPR
     global all_K
-
-    #adding the year to each Dataframe for uses later
-    for i in range(2020,2015,-1):
-            if re.search(str(i), URL):
-                df['Year'] = str(i)
     
-    #renaming the columns for QBs
     if re.search('qb', URL):
-        df.columns = ['Rank', 'Player', 'Comp', 'Att', 'Comp%', 'Yds', 'Y/A', 'PassTD', 'INT', 'SCK', 'RushAtt', 'RushYds', 'RushTD', 'FL', 'GP', 'FPTS', 'FPTS/G', 'OWN', 'Year']
-        df=df.set_index('Rank').drop(labels='OWN', axis=1)
-        df=to_numeric(df)
         all_QB.append(df)
 
-    #renaming the columns for RBs
     elif re.search('rb', URL):
-        df.columns = ['Rank', 'Player', 'RushAtt', 'RushYds', 'Y/A', 'LG', '20+', 'RushTD', 'Rec', 'TGT', 'RecYds', 'Y/R', 'RecTD', 'FL', 'GP', 'FPTS', 'FPTS/G', 'OWN', 'Year']
-        df=df.set_index('Rank').drop(labels=['OWN', '20+'], axis=1)
-        df=to_numeric(df)
         if re.search('Standard', URL):
             all_RB_STD.append(df)
         elif re.search('PPR', URL):
             all_RB_PPR.append(df)
 
-    #renaming the columns for WRs
     elif re.search('wr', URL):
-        df.columns = ['Rank', 'Player', 'Rec', 'TGT', 'RecYds', 'Y/R', 'LG', '20+', 'RecTD', 'RushAtt', 'RushYds', 'RushTD', 'FL', 'GP', 'FPTS', 'FPTS/G', 'OWN', 'Year']
-        df=df.set_index('Rank').drop(labels=['OWN', '20+'], axis=1)
-        df=to_numeric(df)
         if re.search('Standard', URL):
             all_WR_STD.append(df)
         elif re.search('PPR', URL):
             all_WR_PPR.append(df)
-            
-    #renaming the columns for TEs
+
     elif re.search('te', URL):
-        df.columns = ['Rank', 'Player', 'Rec', 'TGT', 'RecYds', 'Y/R', 'LG', '20+', 'RecTD', 'RushAtt', 'RushYds', 'RushTD', 'FL', 'GP', 'FPTS', 'FPTS/G', 'OWN', 'Year']
-        df=df.set_index('Rank').drop(labels=['OWN', '20+', 'RushAtt', 'RushYds', 'RushTD'], axis=1)
-        df=to_numeric(df)
         if re.search('Standard', URL):
             all_TE_STD.append(df)
         elif re.search('PPR', URL):
             all_TE_PPR.append(df)
-        
-    #renaming the columns for Ks
+
     elif re.search('k', URL):
-        df.columns = ['Rank', 'Player', 'FG', 'FGA', 'PCT(%)', 'LG', '1-19', '20-29', '30-39', '40-49', '50+', 'XPT', 'XPA', 'GP', 'FPTS', 'FPTS/G', 'OWN', 'Year']
-        df=df.set_index('Rank').drop(labels=['OWN'], axis=1)
-        df=to_numeric(df)
         all_K.append(df)
-    
+
+def to_numeric(df):
+    for column in df.columns:
+        if column != 'Player':
+            df[column]=df[column].str.replace(',', '').astype('float')
     return df
 
+def renaming_columns(positions):
+
+    for df in positions:
+        #making the variable name a string to find the position for regex
+        pos = [k for k,v in locals().items() if v is df][0]
+        
+        #renaming the columns for QBs
+        if re.search('QB', pos):
+            df.columns = ['Rank', 'Player', 'Comp', 'Att', 'Comp%', 'Yds', 'Y/A', 'PassTD', 'INT', 'SCK', 'RushAtt', 'RushYds', 'RushTD', 'FL', 'GP', 'FPTS', 'FPTS/G', 'OWN', 'Year']
+            df=df.set_index('Rank').drop(labels='OWN', axis=1)
+            df=to_numeric(df)
+        
+        #renaming the columns for RBs
+        elif re.search('RB', pos):
+            df.columns = ['Rank', 'Player', 'RushAtt', 'RushYds', 'Y/A', 'LG', '20+', 'RushTD', 'Rec', 'TGT', 'RecYds', 'Y/R', 'RecTD', 'FL', 'GP', 'FPTS', 'FPTS/G', 'OWN', 'Year']
+            df=df.set_index('Rank').drop(labels=['OWN', '20+'], axis=1)
+            df=to_numeric(df)
+
+        #renaming the columns for WRs
+        elif re.search('WR', pos):
+            df.columns = ['Rank', 'Player', 'Rec', 'TGT', 'RecYds', 'Y/R', 'LG', '20+', 'RecTD', 'RushAtt', 'RushYds', 'RushTD', 'FL', 'GP', 'FPTS', 'FPTS/G', 'OWN', 'Year']
+            df=df.set_index('Rank').drop(labels=['OWN', '20+'], axis=1)
+            df=to_numeric(df)
+      
+        #renaming the columns for TEs
+        elif re.search('TE', pos):
+            df.columns = ['Rank', 'Player', 'Rec', 'TGT', 'RecYds', 'Y/R', 'LG', '20+', 'RecTD', 'RushAtt', 'RushYds', 'RushTD', 'FL', 'GP', 'FPTS', 'FPTS/G', 'OWN', 'Year']
+            df=df.set_index('Rank').drop(labels=['OWN', '20+', 'RushAtt', 'RushYds', 'RushTD'], axis=1)
+            df=to_numeric(df)
+
+        #renaming the columns for Ks
+        elif re.search('K', pos):
+            df.columns = ['Rank', 'Player', 'FG', 'FGA', 'PCT(%)', 'LG', '1-19', '20-29', '30-39', '40-49', '50+', 'XPT', 'XPA', 'GP', 'FPTS', 'FPTS/G', 'OWN', 'Year']
+            df=df.set_index('Rank').drop(labels=['OWN'], axis=1)
+            df=to_numeric(df)
+
 def fantasy_pros_scrape(URL):
- 
     #scraping the URL
     r = requests.get(URL)
     stats = bs(r.content, features='lxml')
@@ -102,77 +114,29 @@ def fantasy_pros_scrape(URL):
         l.append(row)
 
     df = pd.DataFrame(l, columns=column_names)
+    
+    # adding the year to each Dataframe for uses later
+    for i in range(2020,2015,-1):
+            if re.search(str(i), URL):
+                df['Year'] = str(i)
 
-    df = renaming_columns(df, URL)                                                            #renames the columns, adds the year, appends the DataFrames to a collective list for each position
+    append_to_list(df, URL)
 
-    return df
+renaming_columns(positions)                                                            #renames the columns, adds the year, appends the DataFrames to a collective list for each position
+
 
 # All positions in order of top fantasy performers in each respective scoring rules (Standard or Points Per Reception(PPR))
-### Quarterbacks ###
-
-# Standard Scoring
-QB_STD_2020 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/qb.php?year=2020&scoring=Standard')
-QB_STD_2019 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/qb.php?year=2019&scoring=Standard')
-QB_STD_2018 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/qb.php?year=2018&scoring=Standard')
-QB_STD_2017 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/qb.php?year=2017&scoring=Standard')
-QB_STD_2016 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/qb.php?year=2016&scoring=Standard')
-
-### Running Backs ### 
-
-# Standard Scoring
-RB_STD_2020 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/rb.php?year=2020&scoring=Standard')
-RB_STD_2019 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/rb.php?year=2019&scoring=Standard')
-RB_STD_2018 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/rb.php?year=2018&scoring=Standard')
-RB_STD_2017 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/rb.php?year=2017&scoring=Standard')
-RB_STD_2016 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/rb.php?year=2016&scoring=Standard')
-
-#PPR Scoring
-RB_PPR_2020 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/rb.php?year=2020&scoring=PPR')
-RB_PPR_2019 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/rb.php?year=2019&scoring=PPR')
-RB_PPR_2018 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/rb.php?year=2018&scoring=PPR')
-RB_PPR_2017 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/rb.php?year=2017&scoring=PPR')
-RB_PPR_2016 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/rb.php?year=2016&scoring=PPR')
-
-### Wide Receivers ###
-
-# Standard Scoring
-WR_STD_2020 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/wr.php?year=2020&scoring=Standard')
-WR_STD_2019 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/wr.php?year=2019&scoring=Standard')
-WR_STD_2018 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/wr.php?year=2018&scoring=Standard')
-WR_STD_2017 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/wr.php?year=2017&scoring=Standard')
-WR_STD_2016 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/wr.php?year=2016&scoring=Standard')
-
-#PPR Scoring
-WR_PPR_2020 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/wr.php?year=2020&scoring=PPR')
-WR_PPR_2019 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/wr.php?year=2019&scoring=PPR')
-WR_PPR_2018 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/wr.php?year=2018&scoring=PPR')
-WR_PPR_2017 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/wr.php?year=2017&scoring=PPR')
-WR_PPR_2016 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/wr.php?year=2016&scoring=PPR')
-
-### Tight Ends ###
-
-#Standard Scoring
-TE_STD_2020 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/te.php?year=2020&scoring=Standard')
-TE_STD_2019 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/te.php?year=2019&scoring=Standard')
-TE_STD_2018 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/te.php?year=2018&scoring=Standard')
-TE_STD_2017 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/te.php?year=2017&scoring=Standard')
-TE_STD_2016 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/te.php?year=2016&scoring=Standard')
-
-#PPR Scoring
-TE_PPR_2020 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/te.php?year=2020&scoring=PPR')
-TE_PPR_2019 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/te.php?year=2019&scoring=PPR')
-TE_PPR_2018 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/te.php?year=2018&scoring=PPR')
-TE_PPR_2017 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/te.php?year=2017&scoring=PPR')
-TE_PPR_2016 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/te.php?year=2016&scoring=PPR')
-
-### Kickers ###
-
-#Standard Scoring
-K_STD_2020 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/k.php?year=2020&scoring=Standard')
-K_STD_2019 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/k.php?year=2019&scoring=Standard')
-K_STD_2018 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/k.php?year=2018&scoring=Standard')
-K_STD_2017 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/k.php?year=2017&scoring=Standard')
-K_STD_2016 = fantasy_pros_scrape('https://www.fantasypros.com/nfl/stats/k.php?year=2016&scoring=Standard')
+end_year = 2020
+start_year = 2015
+for year in range(end_year, start_year, -1):
+    fantasy_pros_scrape(f'https://www.fantasypros.com/nfl/stats/qb.php?year={year}&scoring=Standard')
+    fantasy_pros_scrape(f'https://www.fantasypros.com/nfl/stats/rb.php?year={year}&scoring=Standard')
+    fantasy_pros_scrape(f'https://www.fantasypros.com/nfl/stats/rb.php?year={year}&scoring=PPR')
+    fantasy_pros_scrape(f'https://www.fantasypros.com/nfl/stats/wr.php?year={year}&scoring=Standard')
+    fantasy_pros_scrape(f'https://www.fantasypros.com/nfl/stats/wr.php?year={year}&scoring=PPR')
+    fantasy_pros_scrape(f'https://www.fantasypros.com/nfl/stats/te.php?year={year}&scoring=Standard')
+    fantasy_pros_scrape(f'https://www.fantasypros.com/nfl/stats/te.php?year={year}&scoring=PPR')
+    fantasy_pros_scrape(f'https://www.fantasypros.com/nfl/stats/k.php?year={year}&scoring=Standard')
 
 ##### ALL Postions #####
 QB = pd.concat(all_QB).set_index(['Year','Player'])
